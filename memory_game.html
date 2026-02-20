@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Memory Flip Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        .game-board {
+            width: 420px;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-gap: 10px;
+        }
+
+        .card {
+            width: 100px;
+            height: 100px;
+            background: #fff;
+            color: black;
+            font-size: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: transform 0.4s;
+        }
+
+        .card.flipped {
+            background: #ffeb3b;
+            transform: rotateY(180deg);
+        }
+
+        .info {
+            margin-top: 15px;
+            font-size: 18px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #ff9800;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #e68900;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🧠 Memory Flip Game</h1>
+
+<div class="game-board" id="gameBoard"></div>
+
+<div class="info">
+    Moves: <span id="moves">0</span> |
+    Matches: <span id="matches">0</span>
+</div>
+
+<button onclick="startGame()">Restart Game</button>
+
+<script>
+const emojis = ["🐶","🐱","🦊","🐼","🐸","🦁","🐵","🐰"];
+let cards = [];
+let flippedCards = [];
+let moves = 0;
+let matches = 0;
+
+function startGame() {
+    const board = document.getElementById("gameBoard");
+    board.innerHTML = "";
+    cards = [...emojis, ...emojis].sort(() => 0.5 - Math.random());
+    flippedCards = [];
+    moves = 0;
+    matches = 0;
+    document.getElementById("moves").innerText = moves;
+    document.getElementById("matches").innerText = matches;
+
+    cards.forEach((emoji, index) => {
+        const card = document.createElement("div");
+        card.classList.add("card");
+        card.dataset.emoji = emoji;
+        card.dataset.index = index;
+        card.innerText = "❓";
+        card.addEventListener("click", flipCard);
+        board.appendChild(card);
+    });
+}
+
+function flipCard() {
+    if (flippedCards.length === 2 || this.classList.contains("flipped")) return;
+
+    this.innerText = this.dataset.emoji;
+    this.classList.add("flipped");
+    flippedCards.push(this);
+
+    if (flippedCards.length === 2) {
+        moves++;
+        document.getElementById("moves").innerText = moves;
+        checkMatch();
+    }
+}
+
+function checkMatch() {
+    const [card1, card2] = flippedCards;
+
+    if (card1.dataset.emoji === card2.dataset.emoji) {
+        matches++;
+        document.getElementById("matches").innerText = matches;
+        flippedCards = [];
+
+        if (matches === emojis.length) {
+            setTimeout(() => {
+                alert("🎉 Congratulations! You won in " + moves + " moves!");
+            }, 300);
+        }
+    } else {
+        setTimeout(() => {
+            card1.innerText = "❓";
+            card2.innerText = "❓";
+            card1.classList.remove("flipped");
+            card2.classList.remove("flipped");
+            flippedCards = [];
+        }, 800);
+    }
+}
+
+startGame();
+</script>
+
+</body>
+</html>
